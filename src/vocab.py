@@ -1,5 +1,4 @@
-"""Wraps a trained SentencePiece model with the project's fixed
-control-symbol ids and add/strip-special-token logic.
+"""Wraps a trained SentencePiece model with the project's fixed control-symbol ids and add/strip-special-token logic.
 """
 import sentencepiece as spm
 

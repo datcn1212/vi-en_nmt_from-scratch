@@ -1,7 +1,6 @@
-"""Preprocessing for the IWSLT15 en-vi corpus: HTML unescape, NFC
-normalisation, a length filter applied to the train split, SentencePiece BPE
-trained on the filtered train split only, and subword-length stats over
-every split (needed later to size the Transformer's max sequence length).
+"""Preprocessing for the IWSLT15 en-vi corpus: HTML unescape, NFC normalisation, 
+a length filter applied to the train split, SentencePiece BPE trained on the filtered train split only, 
+and subword-length stats overevery split.
 """
 import argparse
 import html

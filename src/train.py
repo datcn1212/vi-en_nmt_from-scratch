@@ -1,5 +1,5 @@
 """Training loop: teacher-forced train/dev epochs, checkpointing on best dev
-loss. Shared across architectures - --arch only changes which model gets built.
+loss. Shared across architectures; --arch only changes which model gets built.
 """
 import argparse
 import os

@@ -55,8 +55,7 @@ def beam_search_decode(model, src, src_pad_mask, sos_id=1, eos_id=2, max_len=50,
 
         # Never select from finished alone: cumulative log-prob is negative and
         # strictly decreases with length, so a beam that emitted eos immediately
-        # would always beat any longer, still-open beam if active ones were
-        # excluded here - collapsing every hypothesis to near-empty by default.
+        # would always beat any longer
         pool = finished + beams
         best_seq, _ = max(pool, key=lambda c: _score(c[0], c[1], length_penalty))
     return best_seq[1:]

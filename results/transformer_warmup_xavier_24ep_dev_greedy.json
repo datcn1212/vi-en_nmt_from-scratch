@@ -1,0 +1,11 @@
+{
+  "system": "transformer_warmup_xavier_24ep",
+  "split": "dev",
+  "decode": "greedy",
+  "beam_width": null,
+  "bleu": 19.921066565095497,
+  "signature": "nrefs:1|case:mixed|eff:no|tok:13a|smooth:exp|version:2.6.0",
+  "n_sentences": 500,
+  "checkpoint": "checkpoints/transformer_warmup_xavier_24ep/best.pt",
+  "timestamp": "2026-08-22T22:23:34.503482"
+}
