@@ -25,11 +25,38 @@ class BahdanauAttention(nn.Module):
         return context, alpha
 
 
+class LuongAttention(nn.Module):
+    """Bilinear ("general") score: score(q, k) = q^T W k. Mask and softmax are
+    identical to BahdanauAttention - only the score formula differs.
+
+    scale=True divides by sqrt(hidden_dim): unlike Bahdanau's tanh, the bilinear
+    form has nothing capping the raw score's magnitude, so on trained weights it
+    saturates softmax to near one-hot (measured: raw score std ~88, max softmax
+    prob ~0.97, entropy ~0.07, versus Bahdanau's std ~6.6, prob ~0.51, entropy
+    ~1.4 on the same real batch) - same mechanism as scaled dot-product attention.
+    """
+    def __init__(self, hidden_dim, scale=False):
+        super().__init__()
+        self.W = nn.Linear(2 * hidden_dim, hidden_dim, bias=False)
+        self.scale = hidden_dim ** 0.5 if scale else None
+
+    def forward(self, decoder_hidden, encoder_outputs, src_pad_mask):
+        scores = torch.bmm(self.W(encoder_outputs), decoder_hidden.unsqueeze(2)).squeeze(2)
+        if self.scale is not None:
+            scores = scores / self.scale
+
+        scores = scores.masked_fill(src_pad_mask, float("-inf"))
+        alpha = torch.softmax(scores, dim=-1)
+        context = torch.bmm(alpha.unsqueeze(1), encoder_outputs).squeeze(1)
+        return context, alpha
+
+
 class RNNSeq2Seq(nn.Module):
     def __init__(self, src_vocab_size, tgt_vocab_size, emb_dim=128, hidden_dim=256,
-                 pad_id=0, dropout=0.1, xavier_init=False, attention_type="bahdanau"):
+                 pad_id=0, dropout=0.1, xavier_init=False, attention_type="bahdanau",
+                 luong_scale=False):
         super().__init__()
-        assert attention_type == "bahdanau", "only bahdanau attention is implemented so far"
+        assert attention_type in ("bahdanau", "luong"), f"unknown attention_type: {attention_type}"
 
         self.src_embedding = nn.Embedding(src_vocab_size, emb_dim, padding_idx=pad_id)
         self.tgt_embedding = nn.Embedding(tgt_vocab_size, emb_dim, padding_idx=pad_id)
@@ -38,7 +65,10 @@ class RNNSeq2Seq(nn.Module):
         self.encoder_gru = nn.GRU(emb_dim, hidden_dim, bidirectional=True, batch_first=True)
         self.enc_to_dec = nn.Linear(2 * hidden_dim, hidden_dim)
 
-        self.attention = BahdanauAttention(hidden_dim)
+        if attention_type == "bahdanau":
+            self.attention = BahdanauAttention(hidden_dim)
+        else:
+            self.attention = LuongAttention(hidden_dim, scale=luong_scale)
         self.decoder_cell = nn.GRUCell(emb_dim + 2 * hidden_dim, hidden_dim)
         self.output_layer = nn.Linear(hidden_dim + 2 * hidden_dim, tgt_vocab_size)
 

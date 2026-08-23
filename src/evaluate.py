@@ -23,7 +23,10 @@ SPM_DIR = os.path.join(DATA_DIR, "spm")
 def load_model(checkpoint_path):
     ckpt = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
     if ckpt["arch"] == "rnn":
-        model = RNNSeq2Seq(ckpt["src_vocab_size"], ckpt["tgt_vocab_size"], pad_id=ckpt["pad_id"])
+        attention_type = ckpt["hyperparams"].get("attention_type", "bahdanau")
+        luong_scale = ckpt["hyperparams"].get("luong_scale", False)
+        model = RNNSeq2Seq(ckpt["src_vocab_size"], ckpt["tgt_vocab_size"], pad_id=ckpt["pad_id"],
+                            attention_type=attention_type, luong_scale=luong_scale)
     elif ckpt["arch"] == "transformer":
         model = TransformerSeq2Seq(ckpt["src_vocab_size"], ckpt["tgt_vocab_size"], pad_id=ckpt["pad_id"])
     else:

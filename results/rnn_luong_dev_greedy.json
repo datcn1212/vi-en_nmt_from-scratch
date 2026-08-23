@@ -1,0 +1,11 @@
+{
+  "system": "rnn_luong",
+  "split": "dev",
+  "decode": "greedy",
+  "beam_width": null,
+  "bleu": 14.972011472680995,
+  "signature": "nrefs:1|case:mixed|eff:no|tok:13a|smooth:exp|version:2.6.0",
+  "n_sentences": 500,
+  "checkpoint": "checkpoints/rnn_luong/best.pt",
+  "timestamp": "2026-08-23T08:30:30.342713"
+}

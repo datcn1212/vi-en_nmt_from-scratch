@@ -14,9 +14,11 @@ from transformer_model import TransformerSeq2Seq
 from vocab import PAD_ID, Vocab
 
 
-def build_model(arch, src_vocab_size, tgt_vocab_size, xavier_init=False):
+def build_model(arch, src_vocab_size, tgt_vocab_size, xavier_init=False, attention_type="bahdanau",
+                 luong_scale=False):
     if arch == "rnn":
-        return RNNSeq2Seq(src_vocab_size, tgt_vocab_size, pad_id=PAD_ID, xavier_init=xavier_init)
+        return RNNSeq2Seq(src_vocab_size, tgt_vocab_size, pad_id=PAD_ID, xavier_init=xavier_init,
+                           attention_type=attention_type, luong_scale=luong_scale)
     if arch == "transformer":
         return TransformerSeq2Seq(src_vocab_size, tgt_vocab_size, pad_id=PAD_ID, xavier_init=xavier_init)
     raise ValueError(f"unknown arch: {arch}")
@@ -74,6 +76,10 @@ def main():
     parser.add_argument("--warmup_steps", type=int, default=0,
                          help="Noam warmup, only takes effect when > 0 and --arch transformer")
     parser.add_argument("--xavier_init", action="store_true")
+    parser.add_argument("--attention_type", default="bahdanau", choices=["bahdanau", "luong"],
+                         help="only affects --arch rnn")
+    parser.add_argument("--luong_scale", action="store_true",
+                         help="divide the luong bilinear score by sqrt(hidden_dim); only affects --attention_type luong")
     args = parser.parse_args()
 
     torch.manual_seed(args.seed)
@@ -102,7 +108,8 @@ def main():
         batch_size=args.batch_size, shuffle=False, collate_fn=lambda b: collate_fn(b, PAD_ID),
     )
 
-    model = build_model(args.arch, len(src_vocab), len(tgt_vocab), xavier_init=args.xavier_init).to(device)
+    model = build_model(args.arch, len(src_vocab), len(tgt_vocab), xavier_init=args.xavier_init,
+                         attention_type=args.attention_type, luong_scale=args.luong_scale).to(device)
     criterion = nn.CrossEntropyLoss(ignore_index=PAD_ID)
 
     use_warmup = args.warmup_steps > 0 and args.arch == "transformer"
@@ -123,6 +130,7 @@ def main():
     hyperparams = {
         "arch": args.arch, "epochs": args.epochs, "batch_size": args.batch_size,
         "lr": lr, "seed": args.seed, "warmup_steps": args.warmup_steps, "xavier_init": args.xavier_init,
+        "attention_type": args.attention_type, "luong_scale": args.luong_scale,
     }
 
     best_dev_loss = float("inf")
