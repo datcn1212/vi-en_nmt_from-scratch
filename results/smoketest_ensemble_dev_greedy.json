@@ -1,0 +1,15 @@
+{
+  "system": "smoketest_ensemble",
+  "split": "dev",
+  "decode": "greedy",
+  "bleu": 11.588537042766701,
+  "signature": null,
+  "n_sentences": 5,
+  "checkpoints": [
+    "checkpoints/rnn_xavier/best.pt",
+    "checkpoints/transformer_xavier/best.pt"
+  ],
+  "timestamp": "2026-08-23T13:11:12.687571",
+  "beam_width": null,
+  "combine": "majority"
+}

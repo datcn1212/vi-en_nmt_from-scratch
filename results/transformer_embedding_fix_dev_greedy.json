@@ -1,0 +1,11 @@
+{
+  "system": "transformer_embedding_fix",
+  "split": "dev",
+  "decode": "greedy",
+  "beam_width": null,
+  "bleu": 17.770192072882462,
+  "signature": "nrefs:1|case:mixed|eff:no|tok:13a|smooth:exp|version:2.6.0",
+  "n_sentences": 500,
+  "checkpoint": "checkpoints/transformer_embedding_fix/best.pt",
+  "timestamp": "2026-08-24T00:01:30.114052"
+}

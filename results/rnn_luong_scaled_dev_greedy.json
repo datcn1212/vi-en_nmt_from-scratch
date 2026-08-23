@@ -1,11 +1,11 @@
 {
-  "system": "rnn_xavier",
+  "system": "rnn_luong_scaled",
   "split": "dev",
   "decode": "greedy",
   "beam_width": null,
-  "bleu": 16.804422389129467,
+  "bleu": 16.664902640480417,
   "signature": "nrefs:1|case:mixed|eff:no|tok:13a|smooth:exp|version:2.6.0",
   "n_sentences": 500,
-  "checkpoint": "checkpoints/rnn_xavier/best.pt",
-  "timestamp": "2026-08-23T13:14:40.800692"
+  "checkpoint": "checkpoints/rnn_luong_scaled/best.pt",
+  "timestamp": "2026-08-23T18:19:34.978248"
 }
