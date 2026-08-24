@@ -1,0 +1,11 @@
+{
+  "system": "transformer_warmup_xavier_beam_lp06",
+  "split": "dev",
+  "decode": "beam",
+  "beam_width": 5,
+  "bleu": 20.595414555879646,
+  "signature": "nrefs:1|case:mixed|eff:no|tok:13a|smooth:exp|version:2.6.0",
+  "n_sentences": 500,
+  "checkpoint": "checkpoints/transformer_warmup_xavier/best.pt",
+  "timestamp": "2026-08-24T13:15:21.112526"
+}

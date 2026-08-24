@@ -2,10 +2,12 @@
   "system": "rnn_xavier",
   "split": "dev",
   "decode": "greedy",
-  "beam_width": null,
   "bleu": 16.804422389129467,
-  "signature": "nrefs:1|case:mixed|eff:no|tok:13a|smooth:exp|version:2.6.0",
+  "signature": null,
   "n_sentences": 500,
-  "checkpoint": "checkpoints/rnn_xavier/best.pt",
-  "timestamp": "2026-08-23T13:14:40.800692"
+  "checkpoints": [
+    "checkpoints/rnn_xavier/best.pt"
+  ],
+  "timestamp": "2026-08-24T13:01:05.440163",
+  "beam_width": null
 }

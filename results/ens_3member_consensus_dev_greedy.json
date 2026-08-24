@@ -1,0 +1,16 @@
+{
+  "system": "ens_3member_consensus",
+  "split": "dev",
+  "decode": "greedy",
+  "bleu": 20.849446154687374,
+  "signature": null,
+  "n_sentences": 500,
+  "checkpoints": [
+    "checkpoints/transformer_warmup_xavier/best.pt",
+    "checkpoints/transformer_warmup_xavier_seed123/best.pt",
+    "checkpoints/rnn_xavier/best.pt"
+  ],
+  "timestamp": "2026-08-24T13:02:50.414656",
+  "beam_width": null,
+  "combine": "consensus"
+}

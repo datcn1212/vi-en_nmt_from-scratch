@@ -2,10 +2,12 @@
   "system": "transformer_warmup_xavier",
   "split": "dev",
   "decode": "greedy",
-  "beam_width": null,
   "bleu": 19.69422247259787,
-  "signature": "nrefs:1|case:mixed|eff:no|tok:13a|smooth:exp|version:2.6.0",
+  "signature": null,
   "n_sentences": 500,
-  "checkpoint": "checkpoints/transformer_warmup_xavier/best.pt",
-  "timestamp": "2026-08-21T17:00:35.894870"
+  "checkpoints": [
+    "checkpoints/transformer_warmup_xavier/best.pt"
+  ],
+  "timestamp": "2026-08-24T12:59:29.430120",
+  "beam_width": null
 }
