@@ -9,18 +9,20 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 
 from data import read_parallel, TranslationDataset, collate_fn
+from init_utils import scale_embedding_init
 from rnn_model import RNNSeq2Seq
 from transformer_model import TransformerSeq2Seq
 from vocab import PAD_ID, Vocab
 
 
 def build_model(arch, src_vocab_size, tgt_vocab_size, xavier_init=False, attention_type="bahdanau",
-                 luong_scale=False):
+                 luong_scale=False, dropout=0.1):
     if arch == "rnn":
         return RNNSeq2Seq(src_vocab_size, tgt_vocab_size, pad_id=PAD_ID, xavier_init=xavier_init,
-                           attention_type=attention_type, luong_scale=luong_scale)
+                           attention_type=attention_type, luong_scale=luong_scale, dropout=dropout)
     if arch == "transformer":
-        return TransformerSeq2Seq(src_vocab_size, tgt_vocab_size, pad_id=PAD_ID, xavier_init=xavier_init)
+        return TransformerSeq2Seq(src_vocab_size, tgt_vocab_size, pad_id=PAD_ID, xavier_init=xavier_init,
+                                   dropout=dropout)
     raise ValueError(f"unknown arch: {arch}")
 
 
@@ -80,6 +82,11 @@ def main():
                          help="only affects --arch rnn")
     parser.add_argument("--luong_scale", action="store_true",
                          help="divide the luong bilinear score by sqrt(hidden_dim); only affects --attention_type luong")
+    parser.add_argument("--fix_embedding_init", action="store_true",
+                         help="re-draw embeddings from N(0, 1/d_model) instead of the nn.Embedding "
+                              "default N(0,1); only meaningful for --arch transformer, and meant to be "
+                              "used alone (not with --xavier_init) to isolate this one change")
+    parser.add_argument("--dropout", type=float, default=0.1)
     args = parser.parse_args()
 
     torch.manual_seed(args.seed)
@@ -109,7 +116,13 @@ def main():
     )
 
     model = build_model(args.arch, len(src_vocab), len(tgt_vocab), xavier_init=args.xavier_init,
-                         attention_type=args.attention_type, luong_scale=args.luong_scale).to(device)
+                         attention_type=args.attention_type, luong_scale=args.luong_scale,
+                         dropout=args.dropout)
+    if args.fix_embedding_init:
+        assert args.arch == "transformer", "--fix_embedding_init only makes sense for --arch transformer"
+        scale_embedding_init(model.src_embedding, model.d_model)
+        scale_embedding_init(model.tgt_embedding, model.d_model)
+    model = model.to(device)
     criterion = nn.CrossEntropyLoss(ignore_index=PAD_ID)
 
     use_warmup = args.warmup_steps > 0 and args.arch == "transformer"
@@ -131,6 +144,7 @@ def main():
         "arch": args.arch, "epochs": args.epochs, "batch_size": args.batch_size,
         "lr": lr, "seed": args.seed, "warmup_steps": args.warmup_steps, "xavier_init": args.xavier_init,
         "attention_type": args.attention_type, "luong_scale": args.luong_scale,
+        "fix_embedding_init": args.fix_embedding_init, "dropout": args.dropout,
     }
 
     best_dev_loss = float("inf")

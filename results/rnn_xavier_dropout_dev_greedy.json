@@ -1,0 +1,11 @@
+{
+  "system": "rnn_xavier_dropout",
+  "split": "dev",
+  "decode": "greedy",
+  "beam_width": null,
+  "bleu": 16.722744732963672,
+  "signature": "nrefs:1|case:mixed|eff:no|tok:13a|smooth:exp|version:2.6.0",
+  "n_sentences": 500,
+  "checkpoint": "checkpoints/rnn_xavier_dropout/best.pt",
+  "timestamp": "2026-08-24T10:44:23.527398"
+}

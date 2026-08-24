@@ -86,3 +86,10 @@ def embedding_norm_ratio(model):
     emb_norms = (model.src_embedding.weight * math.sqrt(model.d_model)).norm(dim=-1)
     pe_norms = model.pos_encoding.pe.norm(dim=-1)
     return (emb_norms.mean() / pe_norms.mean()).item()
+
+
+def member_agreement(hyps_a, hyps_b):
+    # Fraction of sentences where two ensemble members produce the exact same
+    # hypothesis - a cheap proxy for how much diversity they actually offer.
+    agree = sum(1 for a, b in zip(hyps_a, hyps_b) if a == b)
+    return agree / len(hyps_a)
