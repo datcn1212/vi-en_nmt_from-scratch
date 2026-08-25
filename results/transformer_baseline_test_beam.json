@@ -1,0 +1,11 @@
+{
+  "system": "transformer_baseline",
+  "split": "test",
+  "decode": "beam",
+  "beam_width": 5,
+  "bleu": 8.764822546266611,
+  "signature": "nrefs:1|case:mixed|eff:no|tok:13a|smooth:exp|version:2.6.0",
+  "n_sentences": 1268,
+  "checkpoint": "checkpoints/transformer_baseline/best.pt",
+  "timestamp": "2026-08-24T16:53:03.497231"
+}

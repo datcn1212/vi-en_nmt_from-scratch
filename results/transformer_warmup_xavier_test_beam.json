@@ -1,0 +1,13 @@
+{
+  "system": "transformer_warmup_xavier",
+  "split": "test",
+  "decode": "beam",
+  "bleu": 21.99391453074173,
+  "signature": null,
+  "n_sentences": 1268,
+  "checkpoints": [
+    "checkpoints/transformer_warmup_xavier/best.pt"
+  ],
+  "timestamp": "2026-08-25T00:54:04.876884",
+  "beam_width": 5
+}
