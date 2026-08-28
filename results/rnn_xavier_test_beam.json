@@ -3,7 +3,7 @@
   "split": "test",
   "decode": "beam",
   "bleu": 20.281097193802953,
-  "signature": null,
+  "signature": "nrefs:1|case:mixed|eff:no|tok:13a|smooth:exp|version:2.6.0",
   "n_sentences": 1268,
   "checkpoints": [
     "checkpoints/rnn_xavier/best.pt"

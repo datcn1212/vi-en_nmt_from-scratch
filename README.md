@@ -1,14 +1,10 @@
 # Vi-En NMT from Scratch
 
-Vietnamese to English neural machine translation, two architectures implemented from
-scratch in plain PyTorch: an RNN/GRU encoder-decoder with attention (Bahdanau and Luong
-variants), and a Transformer encoder-decoder with multi-head self-attention and sinusoidal
-positional encoding. No `torch.nn.Transformer`, no `torch.nn.MultiheadAttention`, no
-pretrained weights.
+Vietnamese to English neural machine translation, two architectures implemented from scratch in plain PyTorch: an RNN/GRU encoder-decoder with attention (Bahdanau and Luong variants), and a Transformer encoder-decoder with multi-head self-attention and sinusoidal positional encoding. No `torch.nn.Transformer`, no `torch.nn.MultiheadAttention`, no pretrained weights.
 
 ## Data
 
-IWSLT15 English-Vietnamese (TED talk transcripts): 133,317 train pairs, 1553 dev pairs, 1268 test pairs. SentencePiece BPE, vocab size 8000, one model per language, trained on the filtered train split only. All text normalized to Unicode NFC before tokenization.
+IWSLT15 English-Vietnamese (TED talk transcripts): 133,317 raw train pairs, 133,222 after a length filter applied to the train split only, plus 1553 dev pairs and 1268 test pairs left unfiltered. SentencePiece BPE, vocab size 8000, one model per language, trained on the filtered train split only. All text normalized to Unicode NFC before tokenization.
 
 ## Results (test set, 1268 sentences, official one-time pass)
 
@@ -33,7 +29,7 @@ ensemble/       ensemble decoding and evaluation (majority voting, consensus bui
 scripts/        one shell script per training run
 tests/          pytest suite (correctness gates: overfit tests, masking, autoregression)
 data/           raw and preprocessed data, tokenizers, fixed dev/test index files
-checkpoints/    trained model weights (git-ignored, see below)
+checkpoints/    trained model weights (git-ignored; reproducible from scripts/ and logs/)
 logs/           training logs, one per run
 results/        BLEU scores, hypotheses, figures, significance tests, error analysis
 report/         write-up and generated tables

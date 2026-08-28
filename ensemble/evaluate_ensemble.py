@@ -27,17 +27,18 @@ def _member_name(checkpoint_path):
     return os.path.basename(os.path.dirname(checkpoint_path))
 
 
-def _write_result(system_name, split, decode, hyps, bleu_score, checkpoints, extra):
+def _write_result(system_name, split, decode, hyps, bleu_metric, bleu_score, checkpoints, extra):
     os.makedirs("results/hyps", exist_ok=True)
     hyps_path = f"results/hyps/{system_name}_{split}_{decode}.txt"
     with open(hyps_path, "w", encoding="utf-8") as f:
         for h in hyps:
             f.write(h + "\n")
 
+    # get_signature() lives on the BLEU metric, not on the BLEUScore it returns - reading it
+    # off the score object silently yields no signature at all, so the metric is passed in.
     record = {
         "system": system_name, "split": split, "decode": decode,
-        "bleu": bleu_score.score, "signature": str(bleu_score.get_signature())
-        if hasattr(bleu_score, "get_signature") else None,
+        "bleu": bleu_score.score, "signature": str(bleu_metric.get_signature()),
         "n_sentences": len(hyps), "checkpoints": checkpoints,
         "timestamp": datetime.datetime.now().isoformat(),
         **extra,
@@ -100,9 +101,10 @@ def main():
             mask = torch.zeros_like(src, dtype=torch.bool)
             hyps.append(tgt_vocab.decode(decode_one(model, src, mask)))
         member_hyps.append(hyps)
-        bleu_score = BLEU().corpus_score(hyps, [refs])
+        bleu_metric = BLEU()
+        bleu_score = bleu_metric.corpus_score(hyps, [refs])
         name = _member_name(ckpt)
-        result_path = _write_result(name, args.split, args.decode, hyps, bleu_score, [ckpt],
+        result_path = _write_result(name, args.split, args.decode, hyps, bleu_metric, bleu_score, [ckpt],
                                      {"beam_width": beam_width})
         print(f"  {name}: {bleu_score.score:.2f}  (wrote {result_path})")
 
@@ -111,9 +113,11 @@ def main():
         src = torch.tensor([src_vocab.encode(src_text)])
         mask = torch.zeros_like(src, dtype=torch.bool)
         ensemble_hyps.append(tgt_vocab.decode(decode_ensemble(src, mask)))
-    ensemble_bleu = BLEU().corpus_score(ensemble_hyps, [refs])
-    result_path = _write_result(args.system_name, args.split, args.decode, ensemble_hyps, ensemble_bleu,
-                                 args.checkpoints, {"beam_width": beam_width, "combine": args.combine})
+    ensemble_metric = BLEU()
+    ensemble_bleu = ensemble_metric.corpus_score(ensemble_hyps, [refs])
+    result_path = _write_result(args.system_name, args.split, args.decode, ensemble_hyps,
+                                 ensemble_metric, ensemble_bleu, args.checkpoints,
+                                 {"beam_width": beam_width, "combine": args.combine})
     print(f"BLEU (ensemble, {args.combine}): {ensemble_bleu.score:.2f}  (wrote {result_path})")
 
 

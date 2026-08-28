@@ -3,7 +3,7 @@
   "split": "dev",
   "decode": "greedy",
   "bleu": 20.194741099757614,
-  "signature": null,
+  "signature": "nrefs:1|case:mixed|eff:no|tok:13a|smooth:exp|version:2.6.0",
   "n_sentences": 500,
   "checkpoints": [
     "checkpoints/transformer_warmup_xavier/best.pt",

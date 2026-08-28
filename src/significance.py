@@ -11,8 +11,11 @@ from data import read_parallel
 COMPARISONS = [
     ("transformer_warmup_xavier_test_beam", "rnn_xavier_test_beam",
      "architecture: best Transformer vs best RNN"),
+    # Two axes differ here (warmup schedule AND Xavier init), so this is the combined
+    # tuned-recipe effect, not the isolated init effect. The isolated Xavier cell
+    # (flat lr + Xavier) is dev-only by design and has no test score to compare against.
     ("transformer_warmup_xavier_test_beam", "transformer_baseline_test_beam",
-     "Xavier init effect (largest effect found)"),
+     "tuned Transformer recipe (warmup + Xavier) vs untuned baseline - largest effect found"),
     ("ens_3member_consensus_test_beam", "ens_3member_majority_test_beam",
      "ensemble combine rule (smallest effect found)"),
     ("transformer_warmup_xavier_test_beam", "transformer_warmup_xavier_seed123_test_beam",

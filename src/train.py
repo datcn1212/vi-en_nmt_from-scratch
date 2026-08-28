@@ -135,16 +135,21 @@ def main():
         scheduler = torch.optim.lr_scheduler.LambdaLR(
             optimizer, lr_lambda=lambda step: noam_lr_lambda(step, d_model, args.warmup_steps)
         )
+        # --lr is deliberately not applied on this branch: the schedule supplies the whole
+        # value. Recording it as None keeps the checkpoint from claiming a rate never used.
+        optim_record = {"lr": None, "lr_schedule": "noam", "betas": [0.9, 0.98], "eps": 1e-9}
     else:
         optimizer = torch.optim.Adam(model.parameters(), lr=lr)
         scheduler = None
+        optim_record = {"lr": lr, "lr_schedule": "flat", "betas": [0.9, 0.999], "eps": 1e-8}
 
     os.makedirs(args.save_dir, exist_ok=True)
     hyperparams = {
         "arch": args.arch, "epochs": args.epochs, "batch_size": args.batch_size,
-        "lr": lr, "seed": args.seed, "warmup_steps": args.warmup_steps, "xavier_init": args.xavier_init,
+        "seed": args.seed, "warmup_steps": args.warmup_steps, "xavier_init": args.xavier_init,
         "attention_type": args.attention_type, "luong_scale": args.luong_scale,
         "fix_embedding_init": args.fix_embedding_init, "dropout": args.dropout,
+        **optim_record,
     }
 
     best_dev_loss = float("inf")
