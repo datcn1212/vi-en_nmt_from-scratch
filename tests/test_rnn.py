@@ -91,4 +91,9 @@ def test_attention_ignores_padding():
         encoder_outputs, hidden = model.encode(pair, mask)
         _, alpha = model.attention(hidden, encoder_outputs, mask)
 
-    assert (alpha[mask] < 0.05).all(), f"max attention weight on padding: {alpha[mask].max().item():.4f}"
+    # Masking before the softmax drives padding weights to exactly 0, so the bar is
+    # numerical zero rather than "small". A loose bar like 0.05 would only catch broken
+    # masking while the batch is under 20 positions wide - at 20 or more, uniform
+    # attention over the row already falls below 0.05 and the test would pass on a
+    # model with no masking at all.
+    assert (alpha[mask] < 1e-6).all(), f"max attention weight on padding: {alpha[mask].max().item():.6f}"
