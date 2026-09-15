@@ -1,0 +1,11 @@
+{
+  "system": "smoketest_lstm",
+  "split": "dev",
+  "decode": "greedy",
+  "beam_width": null,
+  "bleu": 0.0,
+  "signature": "nrefs:1|case:mixed|eff:no|tok:13a|smooth:exp|version:2.6.0",
+  "n_sentences": 5,
+  "checkpoint": "/tmp/smoke_lstm/best.pt",
+  "timestamp": "2026-09-04T11:04:52.866168"
+}

@@ -1,0 +1,11 @@
+{
+  "system": "rnn_lstm_xavier",
+  "split": "dev",
+  "decode": "greedy",
+  "beam_width": null,
+  "bleu": 17.591749390846154,
+  "signature": "nrefs:1|case:mixed|eff:no|tok:13a|smooth:exp|version:2.6.0",
+  "n_sentences": 500,
+  "checkpoint": "checkpoints/rnn_lstm_xavier/best.pt",
+  "timestamp": "2026-09-06T18:18:59.035004"
+}
