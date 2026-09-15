@@ -2,7 +2,7 @@
 
 AI assistants were used throughout this project. 
 
-- Used at decision points, for thinking: choosing an evaluation protocol before any result existed, Vietnamese preprocessing questions, what a given test can and cannot catch, mask edge cases, how to interpret a negative result fairly, how to reason about ensembling, what a significance test does and does not cover, and how to choose error-analysis examples without cherry-picking,... Answers were treated as input to a decision, not as the decision. 
+- Used for thinking purpose: choosing an evaluation protocol before any result existed, Vietnamese preprocessing questions, what a given test can and cannot catch, mask edge cases, how to interpret a negative result fairly, how to reason about ensembling, what a significance test does and does not cover, and how to choose error-analysis examples without cherry-picking,... Answers were treated as input to a decision, not as the decision. 
 
 - Used for coding purpose: writing helper functions for running training jobs and evaluations, parsing logs, computing diagnostics, and generating plots and result tables from the stored JSON files; fixing bugs; recalling function names or logic I couldn't remember exactly; and formatting LaTeX.
 
