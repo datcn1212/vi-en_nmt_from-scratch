@@ -16,10 +16,11 @@ from vocab import PAD_ID, Vocab
 
 
 def build_model(arch, src_vocab_size, tgt_vocab_size, xavier_init=False, attention_type="bahdanau",
-                 luong_scale=False, dropout=0.1):
+                 luong_scale=False, dropout=0.1, cell_type="gru"):
     if arch == "rnn":
         return RNNSeq2Seq(src_vocab_size, tgt_vocab_size, pad_id=PAD_ID, xavier_init=xavier_init,
-                           attention_type=attention_type, luong_scale=luong_scale, dropout=dropout)
+                           attention_type=attention_type, luong_scale=luong_scale, dropout=dropout,
+                           cell_type=cell_type)
     if arch == "transformer":
         return TransformerSeq2Seq(src_vocab_size, tgt_vocab_size, pad_id=PAD_ID, xavier_init=xavier_init,
                                    dropout=dropout)
@@ -87,6 +88,8 @@ def main():
                               "default N(0,1); only meaningful for --arch transformer, and meant to be "
                               "used alone (not with --xavier_init) to isolate this one change")
     parser.add_argument("--dropout", type=float, default=0.1)
+    parser.add_argument("--cell_type", default="gru", choices=["gru", "lstm"],
+                         help="only affects --arch rnn")
     args = parser.parse_args()
 
     torch.manual_seed(args.seed)
@@ -117,7 +120,7 @@ def main():
 
     model = build_model(args.arch, len(src_vocab), len(tgt_vocab), xavier_init=args.xavier_init,
                          attention_type=args.attention_type, luong_scale=args.luong_scale,
-                         dropout=args.dropout)
+                         dropout=args.dropout, cell_type=args.cell_type)
     if args.fix_embedding_init:
         assert args.arch == "transformer", "--fix_embedding_init only makes sense for --arch transformer"
         scale_embedding_init(model.src_embedding, model.d_model)
@@ -149,6 +152,7 @@ def main():
         "seed": args.seed, "warmup_steps": args.warmup_steps, "xavier_init": args.xavier_init,
         "attention_type": args.attention_type, "luong_scale": args.luong_scale,
         "fix_embedding_init": args.fix_embedding_init, "dropout": args.dropout,
+        "cell_type": args.cell_type,
         **optim_record,
     }
 

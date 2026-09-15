@@ -54,22 +54,37 @@ class LuongAttention(nn.Module):
 class RNNSeq2Seq(nn.Module):
     def __init__(self, src_vocab_size, tgt_vocab_size, emb_dim=128, hidden_dim=256,
                  pad_id=0, dropout=0.1, xavier_init=False, attention_type="bahdanau",
-                 luong_scale=False):
+                 luong_scale=False, cell_type="gru"):
         super().__init__()
         assert attention_type in ("bahdanau", "luong"), f"unknown attention_type: {attention_type}"
+        assert cell_type in ("gru", "lstm"), f"unknown cell_type: {cell_type}"
+        self.cell_type = cell_type
 
         self.src_embedding = nn.Embedding(src_vocab_size, emb_dim, padding_idx=pad_id)
         self.tgt_embedding = nn.Embedding(tgt_vocab_size, emb_dim, padding_idx=pad_id)
         self.dropout = nn.Dropout(dropout)
 
-        self.encoder_gru = nn.GRU(emb_dim, hidden_dim, bidirectional=True, batch_first=True)
+        if cell_type == "gru":
+            self.encoder_gru = nn.GRU(emb_dim, hidden_dim, bidirectional=True, batch_first=True)
+        else:
+            self.encoder_lstm = nn.LSTM(emb_dim, hidden_dim, bidirectional=True, batch_first=True)
         self.enc_to_dec = nn.Linear(2 * hidden_dim, hidden_dim)
+        if cell_type == "lstm":
+            # LSTM's cell state is never passed through a bounding nonlinearity by its
+            # own recurrence (only h is, via h_t = o_t * tanh(c_t)), so bridging c the
+            # same way as h - through tanh - would start c_0 in a different scale than
+            # every c_t after it. Linear only, no tanh, to avoid that mismatch.
+            self.enc_to_dec_c = nn.Linear(2 * hidden_dim, hidden_dim)
 
         if attention_type == "bahdanau":
             self.attention = BahdanauAttention(hidden_dim)
         else:
             self.attention = LuongAttention(hidden_dim, scale=luong_scale)
-        self.decoder_cell = nn.GRUCell(emb_dim + 2 * hidden_dim, hidden_dim)
+
+        if cell_type == "gru":
+            self.decoder_cell = nn.GRUCell(emb_dim + 2 * hidden_dim, hidden_dim)
+        else:
+            self.decoder_cell = nn.LSTMCell(emb_dim + 2 * hidden_dim, hidden_dim)
         self.output_layer = nn.Linear(hidden_dim + 2 * hidden_dim, tgt_vocab_size)
 
         if xavier_init:
@@ -77,19 +92,30 @@ class RNNSeq2Seq(nn.Module):
                 if p.dim() > 1:
                     nn.init.xavier_uniform_(p)
 
+    def _query(self, hidden):
+        # LSTMCell's state is a (h, c) tuple; attention and the output layer only
+        # ever need h. GRUCell's state is already just h.
+        return hidden[0] if self.cell_type == "lstm" else hidden
+
     def encode(self, src, src_pad_mask):
         embedded = self.dropout(self.src_embedding(src))
-        encoder_outputs, h_n = self.encoder_gru(embedded)
-        # h_n: [2, B, H], index 0 = forward direction, index 1 = backward (PyTorch convention).
-        h_cat = torch.cat([h_n[0], h_n[1]], dim=-1)
-        hidden = torch.tanh(self.enc_to_dec(h_cat))
+        if self.cell_type == "gru":
+            encoder_outputs, h_n = self.encoder_gru(embedded)
+            # h_n: [2, B, H], index 0 = forward direction, index 1 = backward (PyTorch convention).
+            h_cat = torch.cat([h_n[0], h_n[1]], dim=-1)
+            hidden = torch.tanh(self.enc_to_dec(h_cat))
+        else:
+            encoder_outputs, (h_n, c_n) = self.encoder_lstm(embedded)
+            h_cat = torch.cat([h_n[0], h_n[1]], dim=-1)
+            c_cat = torch.cat([c_n[0], c_n[1]], dim=-1)
+            hidden = (torch.tanh(self.enc_to_dec(h_cat)), self.enc_to_dec_c(c_cat))
         return encoder_outputs, hidden
 
     def _step(self, tgt_token_ids, hidden, encoder_outputs, src_pad_mask):
         embedded = self.dropout(self.tgt_embedding(tgt_token_ids))
-        context, _ = self.attention(hidden, encoder_outputs, src_pad_mask)
+        context, _ = self.attention(self._query(hidden), encoder_outputs, src_pad_mask)
         hidden = self.decoder_cell(torch.cat([embedded, context], dim=-1), hidden)
-        logits = self.output_layer(torch.cat([hidden, context], dim=-1))
+        logits = self.output_layer(torch.cat([self._query(hidden), context], dim=-1))
         return logits, hidden
 
     def forward(self, src, src_pad_mask, tgt_in):

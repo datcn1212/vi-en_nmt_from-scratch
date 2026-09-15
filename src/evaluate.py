@@ -25,8 +25,9 @@ def load_model(checkpoint_path):
     if ckpt["arch"] == "rnn":
         attention_type = ckpt["hyperparams"].get("attention_type", "bahdanau")
         luong_scale = ckpt["hyperparams"].get("luong_scale", False)
+        cell_type = ckpt["hyperparams"].get("cell_type", "gru")
         model = RNNSeq2Seq(ckpt["src_vocab_size"], ckpt["tgt_vocab_size"], pad_id=ckpt["pad_id"],
-                            attention_type=attention_type, luong_scale=luong_scale)
+                            attention_type=attention_type, luong_scale=luong_scale, cell_type=cell_type)
     elif ckpt["arch"] == "transformer":
         model = TransformerSeq2Seq(ckpt["src_vocab_size"], ckpt["tgt_vocab_size"], pad_id=ckpt["pad_id"])
     else:
