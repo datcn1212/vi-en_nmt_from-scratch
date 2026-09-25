@@ -12,7 +12,7 @@ AI assistants were used throughout this project.
 - Evaluation protocol reasoning: section "Experimental setup"
 - Vietnamese preprocessing questions: section "Data"
 - Test coverage and mask edge cases: section "Correctness verification"
-- Interpreting the Luong-attention negative result fairly: section "Development experiments" (Other experiments)
+- Interpreting the Luong-attention negative result fairly: section "Development experiments" 
 - Reasoning about ensembling: section "Ensembling"
 - What the significance test does and does not cover: section "Test results"
 - Choosing error-analysis examples without cherry-picking: section "Error analysis"
@@ -27,5 +27,5 @@ https://claude.ai/share/b935a209-4b1d-45c3-ae49-55b555a55e1b
 https://claude.ai/share/387a4025-a697-4ce2-a302-65f60b5e137a
 https://claude.ai/share/191539e5-53b2-4ee4-ac4c-3506fec8feef
 https://claude.ai/share/952ecf20-7df0-4bfe-ae89-3c3093563ee4
-https://chatgpt.com/share/6a993b35-5518-83eb-ab9e-2fdf12f1f5d7
+https://chatgpt.com/share/6a993b35-5518-83eb-ab9e-2fdf12f1f5d7<br>
 and Claude Code sessions for writing code.
